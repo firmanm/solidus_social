@@ -7,7 +7,7 @@
 <% content_for :page_actions do %>
   <ul class="actions inline-menu">
     <li>
-      <%= button_link_to Spree.t(:new_social_method), new_object_url, icon: 'icon-plus', id: 'admin_new_slide_link' %>
+      <%= button_link_to Spree.t(:new_social_method), new_object_url, id: 'admin_new_slide_link' %>
     </li>
   </ul>
 <% end %>
@@ -34,8 +34,8 @@
       <% @authentication_methods.each do |method|%>
         <tr id="<%= dom_id method %>" data-hook="admin_trackers_index_rows">
           <td class="align-center"><%= method.provider %></td>
-          <td class="align-center"><%= truncate method.api_key, length: 20 %></td>
-          <td class="align-center"><%= truncate method.api_secret, length: 20 %></td>
+          <td class="align-center"><%= truncate method.api_key, length: 10 %></td>
+          <td class="align-center"><%= truncate method.api_secret, length: 10 %></td>
           <td class="align-center"><%= method.environment.to_s.titleize %></td>
           <td class="align-center"><%= method.active ? Spree.t(:yes) : Spree.t(:no) %></td>
           <td class="actions">

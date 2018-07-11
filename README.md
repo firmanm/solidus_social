@@ -22,41 +22,18 @@ $ bundle && bundle exec rails g solidus_social:install
 $ bundle exec rake db:migrate
 ```
 
+This will install a new initializer `config/initializers/solidus_social.rb` into
+your project that allows you to setup the services you want configured for your app.
+
 Optional: By default the login path will be '/users/auth/:provider'. If you
 want something else, configure it in `config/initializers/solidus_social.rb`.
 
-```ruby
-Spree::SocialConfig[:path_prefix] = 'member'  # for /member/auth/:provider
-Spree::SocialConfig[:path_prefix] = 'profile' # for /profile/auth/:provider
-Spree::SocialConfig[:path_prefix] = ''        # for /auth/:provider
-```
 
 ## Using OAuth Sources
 
 Login as an admin user and navigate to Configuration > Social Authentication Methods
 
-Click "New Authentication Method" and enter your API key for the service. (See
-below for instructions on setting up the different providers.)
-
-Multiple key entries can now be entered based on the Rails environment. This
-allows for portability and the lack of need to check in your key to your
-repository. You also have the ability to enable and disable sources. These
-setting will be reflected on the client UI as well.
-
-If you store your configuration/credentials in environment variables, you can
-create Authentication Methods on application boot via an initializer if they
-don't already exist.
-
-```ruby
-# Ensure our environment is bootstrapped with a Facebook Connect app
-if ActiveRecord::Base.connection.table_exists? 'spree_authentication_methods'
-  Spree::AuthenticationMethod.where(environment: Rails.env, provider: 'facebook').first_or_create do |auth_method|
-    auth_method.api_key = ENV['FACEBOOK_APP_ID']
-    auth_method.api_secret = ENV['FACEBOOK_APP_SECRET']
-    auth_method.active = true
-  end
-end
-```
+Click "New Authentication Method" and choose one of your configured providers.
 
 **You MUST restart your application after configuring or updating an authentication method.**
 
@@ -91,7 +68,7 @@ Make sure you specifity the right IP address.
   - Application Website: `http://yourhostname.local:3000` for development and
     `http://your-site.com` for production
   - Application Type: "Browser"
-  - Callback URL: `http://yourhostname.local:3000 for development and
+  - Callback URL: `http://yourhostname.local:3000` for development and
     `http://your-site.com` for production
   - Default Access Type: "Read & Write"
 6. Save the application.
@@ -121,8 +98,14 @@ Make sure you specifity the right IP address.
 > The app console is available at [https://login.amazon.com/manageApps](https://login.amazon.com/manageApps)
 
 ### Google OAuth2
+[Google / APIs / Credentials/ Create Credential](https://console.developers.google.com/)
 
-_TODO: Write instructions._
+1. In the APIs and Services dashboard, visit 'Credentials' on the side, then select 'Create Credentials' and 'Oauth client ID'.
+2. Name the Application, select "Web Application" as a type.
+3. Under "Authorized redirect URIs", add your site (example:
+   `http://localhost:3000/users/auth/google_oauth2/callback`)
+
+> More info: [https://developers.google.com/identity/protocols/OAuth2](https://developers.google.com/identity/protocols/OAuth2)
 
 ### Other OAuth Providers
 
@@ -136,10 +119,16 @@ strategy][12] for them. (If there isn't, you can [write one][13].)
    for SolidusSocial:
 
    ```ruby
-   SolidusSocial::OAUTH_PROVIDERS << ['LinkedIn', 'linkedin']
-   SolidusSocial.init_provider('linkedin')
+
+     config.providers = {
+       # The configuration key has to match your omniauth strategy.
+       linkedin: {
+         api_key: ENV['LINKEDIN_API_KEY'],
+         api_secret: ENV['LINKEDIN_API_SECRET'],
+       },
+       # More providers here
    ```
-3. Activate your provider as usual (via initializer or admin interface).
+3. Activate your provider as usual.
 4. Do **one** of the following:
 
    - Override the `spree/users/social` view to render OAuth links to display

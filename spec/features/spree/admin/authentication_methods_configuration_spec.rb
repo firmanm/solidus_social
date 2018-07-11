@@ -21,19 +21,11 @@ RSpec.feature 'Admin Authentication Methods', :js do
 
       click_link 'New Authentication Method'
       expect(page).to have_text /BACK TO AUTHENTICATION METHODS LIST/i
-      select 'Test', from: 'authentication_method[environment]'
+      select2 'Test', from: 'Environment'
       select2 'Github', from: 'Social Provider'
-      fill_in 'API Key', with: 'KEY123'
-      fill_in 'API Secret', with: 'SEC123'
 
       click_button 'Create'
       expect(page).to have_text 'successfully created!'
-    end
-
-    scenario 'does not save with empty fields' do
-      click_link 'New Authentication Method'
-      click_button 'Create'
-      expect(page).to have_text 'errors prohibited this record from being saved'
     end
   end
 
@@ -58,19 +50,18 @@ RSpec.feature 'Admin Authentication Methods', :js do
         click_icon :edit
       end
 
-      fill_in 'API Key', with: 'fake'
-      fill_in 'API Secret', with: 'fake'
+      find('#authentication_method_active_false').click
 
       click_button 'Update'
       expect(page).to have_text 'successfully updated!'
     end
 
     scenario 'can be deleted' do
-      within_row(1) do
-        click_icon :trash
+      accept_alert do
+        within_row(1) do
+          click_icon :trash
+        end
       end
-
-      page.driver.browser.switch_to.alert.accept unless Capybara.javascript_driver == :poltergeist
 
       expect(page).to have_text 'successfully removed!'
       expect(page).not_to have_text authentication_method.provider
